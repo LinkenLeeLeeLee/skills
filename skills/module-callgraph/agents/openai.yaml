@@ -1,0 +1,4 @@
+interface:
+  display_name: "模块调用关系图"
+  short_description: "从当前源码追踪跨模块类调用，标注模块与子模块并生成可核验流程图"
+  default_prompt: "使用 $module-callgraph 梳理当前 TransAttach 架构及跨模块引用，每个类标明模块.子模块，并绘制业务运行时与规则执行流程图。"
