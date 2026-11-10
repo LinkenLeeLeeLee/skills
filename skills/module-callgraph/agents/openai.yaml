@@ -1,4 +1,4 @@
 interface:
   display_name: "模块调用关系图"
-  short_description: "从当前源码追踪跨模块类调用，标注模块与子模块并生成可核验流程图"
-  default_prompt: "使用 $module-callgraph 梳理当前 TransAttach 架构及跨模块引用，每个类标明模块.子模块，并绘制业务运行时与规则执行流程图。"
+  short_description: "从当前源码追踪跨模块调用，按实际工程结构标注组件归属并生成可核验流程图"
+  default_prompt: "使用 $module-callgraph 基于当前工程源码梳理指定业务入口的跨模块调用与职责，按实际工程结构标注组件归属，绘制 Mermaid 流程图并提供源码证据。"
