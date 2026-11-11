@@ -1,0 +1,4 @@
+interface:
+  display_name: "人工审核开发设计"
+  short_description: "按统一目录编写开发设计，串联需求、流程、接口、数据及审核事项"
+  default_prompt: "请使用 $review-design，按人工审核开发设计模板梳理本次需求，区分现状、确认结论、建议与待确认项。"
