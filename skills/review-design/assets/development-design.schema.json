@@ -1,0 +1,4975 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "后端开发设计数据",
+  "description": "固定九章设计数据；Schema 只约束结构，不证明业务设计或审核已通过。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "design_revision",
+    "标题",
+    "文档信息",
+    "审核关注点",
+    "背景与目标",
+    "需求改动点",
+    "架构设计",
+    "功能点设计",
+    "API接口设计",
+    "数据库变更",
+    "配置变更",
+    "测试与验收",
+    "参考资料"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "3.0.0"
+    },
+    "design_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "标题": {
+      "type": "string"
+    },
+    "文档信息": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "需求编号／名称",
+        "文档状态",
+        "作者／更新日期",
+        "影响系统／模块",
+        "需求与原设计",
+        "实现状态",
+        "源码基线",
+        "需求比较基线",
+        "验证状态"
+      ],
+      "properties": {
+        "需求编号／名称": {
+          "type": "string"
+        },
+        "文档状态": {
+          "enum": [
+            "草稿",
+            "待审核",
+            "修订中",
+            "已确认"
+          ]
+        },
+        "作者／更新日期": {
+          "type": "string"
+        },
+        "影响系统／模块": {
+          "type": "string"
+        },
+        "需求与原设计": {
+          "type": "string"
+        },
+        "实现状态": {
+          "enum": [
+            "未实施",
+            "部分实施",
+            "已实施"
+          ]
+        },
+        "源码基线": {
+          "type": "string"
+        },
+        "需求比较基线": {
+          "type": "string"
+        },
+        "验证状态": {
+          "type": "string"
+        }
+      }
+    },
+    "审核关注点": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "状态",
+        "说明",
+        "待确认问题",
+        "记录"
+      ],
+      "properties": {
+        "状态": {
+          "enum": [
+            "待填写",
+            "已填写",
+            "不适用",
+            "待确认"
+          ]
+        },
+        "说明": {
+          "type": "string"
+        },
+        "待确认问题": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        },
+        "记录": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "编号",
+              "关注点",
+              "类型",
+              "关联内容"
+            ],
+            "properties": {
+              "编号": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "关注点": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "类型": {
+                "enum": [
+                  "设计决定",
+                  "事实核实",
+                  "重点复核"
+                ]
+              },
+              "关联内容": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/reference"
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "不适用"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "说明": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "记录": {
+                "maxItems": 0
+              },
+              "待确认问题": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "待确认"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "待确认问题": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "已填写"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "待确认问题": {
+                "maxItems": 0
+              },
+              "记录": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "背景与目标": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "业务背景与现状问题",
+        "业务主线与关键结果"
+      ],
+      "properties": {
+        "业务背景与现状问题": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "业务主线与关键结果": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "需求改动点": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "功能改动清单",
+        "业务规则",
+        "对象范围与权限边界"
+      ],
+      "properties": {
+        "功能改动清单": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "功能／场景",
+                  "变更类型",
+                  "当前行为及依据",
+                  "目标行为",
+                  "确认状态"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "功能／场景": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "变更类型": {
+                    "enum": [
+                      "新增",
+                      "调整",
+                      "取消"
+                    ]
+                  },
+                  "当前行为及依据": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "目标行为": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "确认状态": {
+                    "enum": [
+                      "已确认",
+                      "建议",
+                      "待确认"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "业务规则": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "关联需求",
+                  "规则名称",
+                  "适用条件",
+                  "规则内容",
+                  "不满足时的业务结果",
+                  "确认状态"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "关联需求": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/reference"
+                    },
+                    "minItems": 1
+                  },
+                  "规则名称": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "适用条件": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "规则内容": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "不满足时的业务结果": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "确认状态": {
+                    "enum": [
+                      "已确认",
+                      "建议",
+                      "待确认"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "对象范围与权限边界": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "关联需求",
+                  "业务对象与粒度",
+                  "版本／历史范围",
+                  "数据归属与共享范围",
+                  "操作权限与限制",
+                  "确认状态"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "关联需求": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/reference"
+                    },
+                    "minItems": 1
+                  },
+                  "业务对象与粒度": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "版本／历史范围": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "数据归属与共享范围": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "操作权限与限制": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "确认状态": {
+                    "enum": [
+                      "已确认",
+                      "建议",
+                      "待确认"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "架构设计": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "现有架构与目标变化",
+        "模块职责与调用关系",
+        "核心对象与数据关系"
+      ],
+      "properties": {
+        "现有架构与目标变化": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "模块职责与调用关系": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "现状调用关系",
+            "目标调用关系",
+            "职责清单"
+          ],
+          "properties": {
+            "现状调用关系": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "Mermaid"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "Mermaid": {
+                  "type": "string"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "Mermaid": {
+                        "maxLength": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "目标调用关系": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "Mermaid"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "Mermaid": {
+                  "type": "string"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "Mermaid": {
+                        "maxLength": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "职责清单": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "业务模块",
+                      "子模块／技术层",
+                      "组件／契约",
+                      "负责事项",
+                      "调用对象及契约",
+                      "变更方式"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "业务模块": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "子模块／技术层": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "组件／契约": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "负责事项": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "调用对象及契约": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "核心对象与数据关系": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "对象清单",
+            "关系与转换边界"
+          ],
+          "properties": {
+            "对象清单": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "对象／模型",
+                      "类型与所属模块／层",
+                      "业务语义及标识粒度",
+                      "关系与归属",
+                      "核心行为／规则",
+                      "变更方式"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "对象／模型": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "类型与所属模块／层": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "业务语义及标识粒度": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "关系与归属": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "核心行为／规则": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "关系与转换边界": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "Mermaid"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "Mermaid": {
+                  "type": "string"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "Mermaid": {
+                        "maxLength": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "功能点设计": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "状态",
+        "说明",
+        "待确认问题",
+        "功能"
+      ],
+      "properties": {
+        "状态": {
+          "enum": [
+            "待填写",
+            "已填写",
+            "不适用",
+            "待确认"
+          ]
+        },
+        "说明": {
+          "type": "string"
+        },
+        "待确认问题": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        },
+        "功能": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "编号",
+              "名称",
+              "入口、参与者与前置条件",
+              "主流程与输入输出",
+              "状态流转与操作矩阵",
+              "关键时序图",
+              "异常、并发与幂等",
+              "审计与外部副作用",
+              "方案定位",
+              "关联需求"
+            ],
+            "properties": {
+              "编号": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "名称": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "入口、参与者与前置条件": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "状态",
+                  "说明",
+                  "待确认问题"
+                ],
+                "properties": {
+                  "状态": {
+                    "enum": [
+                      "待填写",
+                      "已填写",
+                      "不适用",
+                      "待确认"
+                    ]
+                  },
+                  "说明": {
+                    "type": "string"
+                  },
+                  "待确认问题": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/question"
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "不适用"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "待确认问题": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "待确认"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "已填写"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "maxItems": 0
+                        },
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "主流程与输入输出": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "状态",
+                  "说明",
+                  "待确认问题",
+                  "记录"
+                ],
+                "properties": {
+                  "状态": {
+                    "enum": [
+                      "待填写",
+                      "已填写",
+                      "不适用",
+                      "待确认"
+                    ]
+                  },
+                  "说明": {
+                    "type": "string"
+                  },
+                  "待确认问题": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/question"
+                    }
+                  },
+                  "记录": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "编号",
+                        "负责模块／层",
+                        "组件／方法",
+                        "输入及来源",
+                        "处理与规则引用",
+                        "输出／写入",
+                        "事务及失败处理"
+                      ],
+                      "properties": {
+                        "编号": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "负责模块／层": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "组件／方法": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "输入及来源": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "处理与规则引用": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "输出／写入": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "事务及失败处理": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "不适用"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "记录": {
+                          "maxItems": 0
+                        },
+                        "待确认问题": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "待确认"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "已填写"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "maxItems": 0
+                        },
+                        "记录": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "状态流转与操作矩阵": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "状态",
+                  "说明",
+                  "待确认问题",
+                  "记录"
+                ],
+                "properties": {
+                  "状态": {
+                    "enum": [
+                      "待填写",
+                      "已填写",
+                      "不适用",
+                      "待确认"
+                    ]
+                  },
+                  "说明": {
+                    "type": "string"
+                  },
+                  "待确认问题": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/question"
+                    }
+                  },
+                  "记录": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "编号",
+                        "当前状态",
+                        "动作",
+                        "条件／角色",
+                        "目标状态",
+                        "副作用",
+                        "重复请求结果"
+                      ],
+                      "properties": {
+                        "编号": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "当前状态": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "动作": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "条件／角色": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "目标状态": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "副作用": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "重复请求结果": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "不适用"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "记录": {
+                          "maxItems": 0
+                        },
+                        "待确认问题": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "待确认"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "已填写"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "maxItems": 0
+                        },
+                        "记录": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "关键时序图": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "状态",
+                  "说明",
+                  "待确认问题",
+                  "Mermaid"
+                ],
+                "properties": {
+                  "状态": {
+                    "enum": [
+                      "待填写",
+                      "已填写",
+                      "不适用",
+                      "待确认"
+                    ]
+                  },
+                  "说明": {
+                    "type": "string"
+                  },
+                  "待确认问题": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/question"
+                    }
+                  },
+                  "Mermaid": {
+                    "type": "string"
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "不适用"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "Mermaid": {
+                          "maxLength": 0
+                        },
+                        "待确认问题": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "待确认"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "已填写"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "maxItems": 0
+                        },
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "异常、并发与幂等": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "状态",
+                  "说明",
+                  "待确认问题"
+                ],
+                "properties": {
+                  "状态": {
+                    "enum": [
+                      "待填写",
+                      "已填写",
+                      "不适用",
+                      "待确认"
+                    ]
+                  },
+                  "说明": {
+                    "type": "string"
+                  },
+                  "待确认问题": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/question"
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "不适用"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "待确认问题": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "待确认"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "已填写"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "maxItems": 0
+                        },
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "审计与外部副作用": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "状态",
+                  "说明",
+                  "待确认问题"
+                ],
+                "properties": {
+                  "状态": {
+                    "enum": [
+                      "待填写",
+                      "已填写",
+                      "不适用",
+                      "待确认"
+                    ]
+                  },
+                  "说明": {
+                    "type": "string"
+                  },
+                  "待确认问题": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/question"
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "不适用"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "待确认问题": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "待确认"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "状态": {
+                          "const": "已填写"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "待确认问题": {
+                          "maxItems": 0
+                        },
+                        "说明": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "方案定位": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "关联需求": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/reference"
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "不适用"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "说明": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "功能": {
+                "maxItems": 0
+              },
+              "待确认问题": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "待确认"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "待确认问题": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "已填写"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "待确认问题": {
+                "maxItems": 0
+              },
+              "功能": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "API接口设计": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "接口清单与兼容性",
+        "请求与响应",
+        "错误、操作资格与幂等结果"
+      ],
+      "properties": {
+        "接口清单与兼容性": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "HTTP API",
+            "跨模块 Client",
+            "事件与异步契约"
+          ],
+          "properties": {
+            "HTTP API": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "变更方式",
+                      "方法与路径",
+                      "用途",
+                      "调用方",
+                      "身份／应用／租户范围及权限",
+                      "对应功能",
+                      "兼容处理"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "方法与路径": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "用途": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "调用方": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "身份／应用／租户范围及权限": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "对应功能": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/reference"
+                        },
+                        "minItems": 1
+                      },
+                      "兼容处理": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "跨模块 Client": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "变更方式",
+                      "提供模块／Client 方法",
+                      "调用模块／层",
+                      "输入输出模型归属",
+                      "租户／调用身份／授权责任",
+                      "对应功能",
+                      "兼容处理"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "提供模块／Client 方法": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "调用模块／层": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "输入输出模型归属": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "租户／调用身份／授权责任": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "对应功能": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/reference"
+                        },
+                        "minItems": 1
+                      },
+                      "兼容处理": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "事件与异步契约": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "变更方式",
+                      "事件／消息标识",
+                      "发布方／消费入口",
+                      "载荷模型与版本",
+                      "投递／消费契约",
+                      "对应功能",
+                      "兼容处理"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "事件／消息标识": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "发布方／消费入口": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "载荷模型与版本": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "投递／消费契约": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "对应功能": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/reference"
+                        },
+                        "minItems": 1
+                      },
+                      "兼容处理": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "请求与响应": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "契约编号",
+                  "方向／模型",
+                  "字段路径",
+                  "类型／格式",
+                  "必填／可空",
+                  "来源／语义",
+                  "校验／兼容规则"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "契约编号": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/reference"
+                    },
+                    "minItems": 1
+                  },
+                  "方向／模型": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "字段路径": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "类型／格式": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "必填／可空": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "来源／语义": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "校验／兼容规则": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "错误、操作资格与幂等结果": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "契约编号",
+                  "失败／重复场景",
+                  "判定责任与规则引用",
+                  "返回值／错误码／异常／消费结果",
+                  "调用方处理",
+                  "消息资源／设计引用"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "契约编号": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/reference"
+                    },
+                    "minItems": 1
+                  },
+                  "失败／重复场景": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "判定责任与规则引用": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "返回值／错误码／异常／消费结果": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "调用方处理": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "消息资源／设计引用": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "数据库变更": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "表及实体变更总览",
+        "字段设计",
+        "索引、约束与查询",
+        "迁移与数据一致性"
+      ],
+      "properties": {
+        "表及实体变更总览": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "表／实体",
+                  "变更方式",
+                  "职责",
+                  "关联／基数",
+                  "历史数据影响"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "表／实体": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "变更方式": {
+                    "enum": [
+                      "新增",
+                      "修改",
+                      "复用",
+                      "删除",
+                      "废弃"
+                    ]
+                  },
+                  "职责": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "关联／基数": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "历史数据影响": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "字段设计": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "表／实体",
+                  "字段",
+                  "数据库类型／长度",
+                  "非空／默认值",
+                  "业务语义／来源",
+                  "可变性与历史处理",
+                  "关联模型字段"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "表／实体": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "字段": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "数据库类型／长度": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "非空／默认值": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "业务语义／来源": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "可变性与历史处理": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "关联模型字段": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "索引、约束与查询": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "表／实体",
+                  "索引／约束／查询",
+                  "定义",
+                  "业务用途",
+                  "租户及唯一性范围",
+                  "分页／排序／性能影响"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "表／实体": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "索引／约束／查询": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "定义": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "业务用途": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "租户及唯一性范围": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "分页／排序／性能影响": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "迁移与数据一致性": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "配置变更": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "配置与资源清单",
+        "配置兼容与管理"
+      ],
+      "properties": {
+        "配置与资源清单": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Master Table",
+            "Trigger Event",
+            "Message Resource",
+            "其他配置与资源"
+          ],
+          "properties": {
+            "Master Table": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "Master Table 编码／名称",
+                      "Record 编码／名称",
+                      "变更方式",
+                      "字段及原值 → 新值",
+                      "作用范围",
+                      "初始化／维护方式"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "Master Table 编码／名称": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "Record 编码／名称": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "字段及原值 → 新值": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "作用范围": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "初始化／维护方式": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "Trigger Event": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "Event 编码／名称",
+                      "变更方式",
+                      "触发场景与时机",
+                      "关联动作／处理器",
+                      "配置字段及原值 → 新值",
+                      "作用范围",
+                      "初始化／维护方式"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "Event 编码／名称": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "触发场景与时机": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "关联动作／处理器": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "配置字段及原值 → 新值": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "作用范围": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "初始化／维护方式": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "Message Resource": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "Resource Key",
+                      "变更方式",
+                      "语言",
+                      "原文案 → 新文案",
+                      "占位参数及含义",
+                      "使用位置",
+                      "维护方式"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "Resource Key": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "语言": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "原文案 → 新文案": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "占位参数及含义": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "使用位置": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "维护方式": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "其他配置与资源": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "状态",
+                "说明",
+                "待确认问题",
+                "记录"
+              ],
+              "properties": {
+                "状态": {
+                  "enum": [
+                    "待填写",
+                    "已填写",
+                    "不适用",
+                    "待确认"
+                  ]
+                },
+                "说明": {
+                  "type": "string"
+                },
+                "待确认问题": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/question"
+                  }
+                },
+                "记录": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "编号",
+                      "配置／资源",
+                      "类型／存储位置",
+                      "变更方式",
+                      "原值 → 新值",
+                      "作用范围／默认值",
+                      "初始化／维护方式"
+                    ],
+                    "properties": {
+                      "编号": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "配置／资源": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "类型／存储位置": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "变更方式": {
+                        "enum": [
+                          "新增",
+                          "修改",
+                          "复用",
+                          "删除",
+                          "废弃"
+                        ]
+                      },
+                      "原值 → 新值": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "作用范围／默认值": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "初始化／维护方式": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    }
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "不适用"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "说明": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "记录": {
+                        "maxItems": 0
+                      },
+                      "待确认问题": {
+                        "maxItems": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "待确认"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "状态": {
+                        "const": "已填写"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "待确认问题": {
+                        "maxItems": 0
+                      },
+                      "记录": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "配置兼容与管理": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "测试与验收": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "单元测试设计",
+        "集成测试设计",
+        "业务验收设计"
+      ],
+      "properties": {
+        "单元测试设计": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "测试对象",
+                  "关联规则及章节",
+                  "输入条件",
+                  "预期结果",
+                  "当前证据／状态"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "测试对象": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "关联规则及章节": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/reference"
+                    },
+                    "minItems": 1
+                  },
+                  "输入条件": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "预期结果": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "当前证据／状态": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "集成测试设计": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "协作链路及设计章节",
+                  "真实依赖／替身",
+                  "前置数据",
+                  "执行动作",
+                  "预期结果",
+                  "当前证据／状态"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "协作链路及设计章节": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "真实依赖／替身": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "前置数据": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "执行动作": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "预期结果": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "当前证据／状态": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "业务验收设计": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "状态",
+            "说明",
+            "待确认问题",
+            "记录"
+          ],
+          "properties": {
+            "状态": {
+              "enum": [
+                "待填写",
+                "已填写",
+                "不适用",
+                "待确认"
+              ]
+            },
+            "说明": {
+              "type": "string"
+            },
+            "待确认问题": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/question"
+              }
+            },
+            "记录": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "编号",
+                  "关联需求及章节",
+                  "角色与业务场景",
+                  "前置条件",
+                  "操作步骤",
+                  "预期可观察结果",
+                  "验收方式",
+                  "当前证据／状态"
+                ],
+                "properties": {
+                  "编号": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "关联需求及章节": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/reference"
+                    },
+                    "minItems": 1
+                  },
+                  "角色与业务场景": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "前置条件": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "操作步骤": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "预期可观察结果": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "验收方式": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "当前证据／状态": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "不适用"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "说明": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "记录": {
+                    "maxItems": 0
+                  },
+                  "待确认问题": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "待确认"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "状态": {
+                    "const": "已填写"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "待确认问题": {
+                    "maxItems": 0
+                  },
+                  "记录": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "参考资料": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "状态",
+        "说明",
+        "待确认问题",
+        "记录"
+      ],
+      "properties": {
+        "状态": {
+          "enum": [
+            "待填写",
+            "已填写",
+            "不适用",
+            "待确认"
+          ]
+        },
+        "说明": {
+          "type": "string"
+        },
+        "待确认问题": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        },
+        "记录": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "编号",
+              "资料类型",
+              "标题／源码位置",
+              "版本／日期",
+              "链接／路径",
+              "支持的结论"
+            ],
+            "properties": {
+              "编号": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "资料类型": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "标题／源码位置": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "版本／日期": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "链接／路径": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "支持的结论": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "不适用"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "说明": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "记录": {
+                "maxItems": 0
+              },
+              "待确认问题": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "待确认"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "待确认问题": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "状态": {
+                "const": "已填写"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "待确认问题": {
+                "maxItems": 0
+              },
+              "记录": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "问题",
+        "影响",
+        "关闭条件"
+      ],
+      "properties": {
+        "问题": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "影响": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "关闭条件": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "区域",
+        "编号"
+      ],
+      "properties": {
+        "区域": {
+          "type": "string",
+          "enum": [
+            "需求改动点.功能改动清单",
+            "需求改动点.业务规则",
+            "需求改动点.对象范围与权限边界",
+            "架构设计.模块职责与调用关系.职责清单",
+            "架构设计.核心对象与数据关系.对象清单",
+            "API接口设计.接口清单与兼容性.HTTP API",
+            "API接口设计.接口清单与兼容性.跨模块 Client",
+            "API接口设计.接口清单与兼容性.事件与异步契约",
+            "API接口设计.请求与响应",
+            "API接口设计.错误、操作资格与幂等结果",
+            "数据库变更.表及实体变更总览",
+            "数据库变更.字段设计",
+            "数据库变更.索引、约束与查询",
+            "配置变更.配置与资源清单.Master Table",
+            "配置变更.配置与资源清单.Trigger Event",
+            "配置变更.配置与资源清单.Message Resource",
+            "配置变更.配置与资源清单.其他配置与资源",
+            "测试与验收.单元测试设计",
+            "测试与验收.集成测试设计",
+            "测试与验收.业务验收设计",
+            "参考资料",
+            "功能点设计"
+          ]
+        },
+        "编号": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

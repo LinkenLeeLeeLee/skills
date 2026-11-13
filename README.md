@@ -21,7 +21,15 @@ skills/
 └── review-design/
     ├── SKILL.md
     ├── agents/openai.yaml
-    └── assets/development-design-template.md
+    ├── assets/development-design.schema.json
+    ├── assets/development-design.blank.json
+    ├── assets/development-design-template.md
+    ├── assets/development-design-feature-template.md
+    ├── references/filling-guide.md
+    ├── references/data-contract.md
+    ├── scripts/design_document.py
+    ├── scripts/requirements.txt
+    └── tests/test_design_document.py
 ```
 
 ## 安装到 Codex
@@ -65,6 +73,10 @@ python3 skills/module-callgraph/scripts/inventory_sources.py /path/to/repository
 区分现状、已确认决定、设计建议与待确认项，列出审核关注点及验收方式。
 ```
 
-支持目录预览、完整设计和既有设计的增量更新，使用[开发设计模板](skills/review-design/assets/development-design-template.md)统一一级目录；不适用的章节说明原因。有架构修改时提供核心模块调用关系图，复杂关键流程按适用范围提供时序图。
+支持目录预览、完整设计和既有设计的增量更新。Skill 根据需求、源码和工程约定决定内容，[Schema](skills/review-design/assets/development-design.schema.json)固定数据结构，[空白 JSON](skills/review-design/assets/development-design.blank.json)承载本次设计，[开发设计模板](skills/review-design/assets/development-design-template.md)生成固定九章的人工审核视图。JSON 与 Markdown 成对交付，修订先更新 JSON，再生成 Markdown。
+
+区域区分待填写、已填写、不适用和待确认；送审校验拒绝待填写。普通数字编号通过区域定位，脚本检查结构化引用的目标，不代替业务审核、需求覆盖判断或 Mermaid 渲染。有架构修改时提供核心模块调用关系图，复杂关键流程按适用范围提供时序图。
+
+生成工具要求 Python 3.9+，校验和生成使用 `jsonschema`；依赖、初始化、草稿／送审和覆盖选项见[数据与生成约定](skills/review-design/references/data-contract.md)。
 
 该 Skill 负责设计文档，不代替代码 Review 或产品审批，也不因生成文档自动修改业务代码、执行部署或新增等待批准的流程。审核记录和验证状态必须有真实依据。
